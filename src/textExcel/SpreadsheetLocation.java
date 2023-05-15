@@ -4,8 +4,7 @@ package textExcel;
 
 public class SpreadsheetLocation implements Location
 {
-    private final int x;
-    private final int y;
+    private final int x, y;
 
     @Override
     public int getRow()
@@ -23,5 +22,10 @@ public class SpreadsheetLocation implements Location
     {
         x = cellName.charAt(0) - 'A';
         y = Integer.parseInt(cellName.substring(1)) - 1;
+    }
+
+    public SpreadsheetLocation(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 }

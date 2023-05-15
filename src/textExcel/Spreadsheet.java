@@ -38,10 +38,13 @@ public class Spreadsheet implements Grid {
                 if (segments.hasNext()) {
 					segment = segments.next();
 					if (!CELL.matcher(segment).matches()) throw new InvalidCellException("Cell '" + segment + "' is not properly formatted.");
-                    Location loc = new SpreadsheetLocation(segments.next());
+                    Location loc = new SpreadsheetLocation(segment);
                     cells.get(loc.getRow()).set(loc.getCol(), null);
+                    System.out.println(getGridText());
+                    return "Cleared " + segment;
                 } else {
                     clearGrid();
+                    return "Cleared the grid";
                 }
             }
             case "save" -> {
@@ -83,21 +86,27 @@ public class Spreadsheet implements Grid {
         return cells.get(loc.getRow()).get(loc.getCol());
     }
 
+    private String getAbbreviatedCellValue(Location loc) {
+        Cell cell = getCell(loc);
+        return cell == null ? "          " : cell.abbreviatedCellText();
+    }
+
     @Override
     public String getGridText() {
         StringBuilder builder = new StringBuilder();
-        builder.append("   ");
+        builder.append("   |");
         for (int i = 'A'; i < 'A' + 12; i++) {
-            builder.append("|").append((char) i).append("         |");
+            builder.append((char) i).append("         |");
         }
         builder.append("\n");
         for (int i = 0; i < 20; i++) {
-            builder.append(String.format("%-3d", i + 1));
+            builder.append(String.format("%-3d|", i + 1));
             for (int j = 0; j < 12; j++) {
-                builder.append(String.format("|%-10s", ""));
+                builder.append(String.format("%-10s|", getAbbreviatedCellValue(new SpreadsheetLocation(j, i))));// TODO: Why reverse????
             }
+            builder.append("\n");
         }
-        return null;
+        return builder.toString();
     }
 
 }
