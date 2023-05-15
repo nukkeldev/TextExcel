@@ -4,35 +4,24 @@ package textExcel;
 
 public class SpreadsheetLocation implements Location
 {
-    private int x, y;
-    private Cell cell;
-
-    public SpreadsheetLocation(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.cell = null;
-    }
+    private final int x;
+    private final int y;
 
     @Override
     public int getRow()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return y;
     }
 
     @Override
     public int getCol()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return x;
     }
     
     public SpreadsheetLocation(String cellName)
     {
-        // TODO: Fill this out with your own code
-    }
-
-    public void clear() {
-        cell = null;
+        x = cellName.charAt(0) - 'A';
+        y = Integer.parseInt(cellName.substring(1));
     }
 }

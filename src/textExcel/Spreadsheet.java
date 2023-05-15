@@ -2,71 +2,91 @@ package textExcel;
 
 // Update this file with your own code.
 
-import jdk.jfr.ContentType;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Spreadsheet implements Grid {
+    private static final Pattern CELL = Pattern.compile("[A-Z]\\d");
 
-	private final List<List<SpreadsheetLocation>> cells;
+    private List<List<Cell>> cells;
 
-	public Spreadsheet() {
-		cells = new ArrayList<>() {{
-			for (int i  = 0; i < 20; i++) {
-				int _i = i;
-				add(new ArrayList<>() {{
-					for (int j = 0 ;  j < 12 ; j++)
-						add(new SpreadsheetLocation(_i, j)); }});
-			}
-		}};
-	}
+    public Spreadsheet() {
+        clearGrid();
+    }
 
-	@Override
-	public String processCommand(String command)
-	{
-		Iterator<String> segs = Arrays.stream(command.split(" ")).iterator();
+    private void clearGrid() {
+        cells = new ArrayList<>() {{
+            for (int i = 0; i < 20; i++) {
+                add(new ArrayList<>() {{
+                    for (int j = 0; j < 12; j++)
+                        add(null);
+                }});
+            }
+        }};
+    }
 
-		switch (segs.next()) {
-			case "clear" -> {
-				if (segs.hasNext()) {
+    @Override
+    public String processCommand(String command) {
+        Iterator<String> segments = Arrays.stream(command.split(" ")).iterator();
 
-				} else {
-					cells.forEach(cellRow -> cellRow.forEach(SpreadsheetLocation::clear));
-				}
-			}
-		}
-		return null;
-	}
+        String segment = segments.next();
+        switch (segment) {
+            case "clear" -> {
+                if (segments.hasNext()) {
+					segment = segments.next();
+					if (!CELL.matcher(segment).matches()) throw new InvalidCellException("Cell '" + segment + "' is not properly formatted.");
+                    Location loc = new SpreadsheetLocation(segments.next());
+                    cells.get(loc.getRow()).set(loc.getCol(), null);
+                } else {
+                    clearGrid();
+                }
+            }
+            case "save" -> {
+                if (!segments.hasNext()) throw new InvalidCommandException("'save' requires a file path argument.");
+                // Save
+            }
+            case "open" -> {
+                if (!segments.hasNext()) throw new InvalidCommandException("'open' requires a file path argument.");
+                // Open
+            }
+            default -> {
+                if (CELL.matcher(segment).matches()) {
+					Location loc = new SpreadsheetLocation(segment);
+                    if (segments.hasNext() && segments.next().equals("=")) {
+//                        cells.get(loc.getRow()).set(loc.getCol(), )
+                    } else {
+                        return getCell(loc).fullCellText();
+                    }
+                } else {
+                    throw new InvalidCommandException("Unknown command '" + segment + "'.");
+                }
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public int getRows()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public int getRows() {
+        return cells.size();
+    }
 
-	@Override
-	public int getCols()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public int getCols() {
+        return cells.get(0).size();
+    }
 
-	@Override
-	public Cell getCell(Location loc)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Cell getCell(Location loc) {
+        return cells.get(loc.getRow()).get(loc.getCol());
+    }
 
-	@Override
-	public String getGridText()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getGridText() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
