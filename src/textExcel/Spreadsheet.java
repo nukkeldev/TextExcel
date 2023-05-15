@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Spreadsheet implements Grid {
-    private static final Pattern CELL = Pattern.compile("[A-Z]\\d");
+    private static final Pattern CELL = Pattern.compile("[A-Z]\\d+");
 
     private List<List<Cell>> cells;
 

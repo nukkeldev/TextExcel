@@ -22,6 +22,6 @@ public class SpreadsheetLocation implements Location
     public SpreadsheetLocation(String cellName)
     {
         x = cellName.charAt(0) - 'A';
-        y = Integer.parseInt(cellName.substring(1));
+        y = Integer.parseInt(cellName.substring(1)) - 1;
     }
 }

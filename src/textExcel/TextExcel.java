@@ -12,7 +12,12 @@ public class TextExcel {
 		Scanner scanner = new Scanner(System.in);
 		String cmd = scanner.nextLine();
 		while (!cmd.equals("quit")) {
-			spreadsheet.processCommand(cmd);
+			try {
+				spreadsheet.processCommand(cmd);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+
+			}
 			cmd = scanner.nextLine();
 		}
 	}
