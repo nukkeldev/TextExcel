@@ -169,11 +169,10 @@ public class Spreadsheet implements Grid {
         for (int i = 0; i < 20; i++) {
             builder.append(String.format("%-3d|", i + 1));
             for (int j = 0; j < 12; j++) {
-                builder.append(String.format("%-10s|", getAbbreviatedCellValue(new SpreadsheetLocation(j, i))));// TODO: Why reverse????
+                builder.append(getAbbreviatedCellValue(new SpreadsheetLocation(j, i))).append("|");// TODO: Why reverse????
             }
             builder.append("\n");
         }
         return builder.toString();
     }
-
 }

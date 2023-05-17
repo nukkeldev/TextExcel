@@ -10,7 +10,7 @@ public class PercentCell implements Cell{
 
     @Override
     public String abbreviatedCellText() {
-        return String.valueOf((int)(value * 100.0));
+        return String.format("%-10s", (int)(value * 100.0) + "%");
     }
 
     @Override

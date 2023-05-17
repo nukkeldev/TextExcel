@@ -9,7 +9,7 @@ public class ValueCell implements Cell{
     @Override
     public String abbreviatedCellText() {
         String temp = String.valueOf(value);
-        return temp.length() > 10 ? temp.substring(0, 10) : temp;
+        return temp.length() > 10 ? temp.substring(0, 10) : String.format("%-10s", temp);
     }
 
     @Override
