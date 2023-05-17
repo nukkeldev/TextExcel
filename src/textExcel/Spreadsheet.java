@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 public class Spreadsheet implements Grid {
     private static final Pattern CELL = Pattern.compile("[A-Z]\\d+");
 
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private List<List<Cell>> cells;
 
     public Spreadsheet() {
@@ -22,7 +23,7 @@ public class Spreadsheet implements Grid {
             for (int i = 0; i < 20; i++) {
                 add(new ArrayList<>() {{
                     for (int j = 0; j < 12; j++)
-                        add(new TextCell());
+                        add(new EmptyCell());
                 }});
             }
         }};
@@ -41,7 +42,7 @@ public class Spreadsheet implements Grid {
                     if (!CELL.matcher(segment).matches())
                         throw new InvalidCellException("Cell '" + segment + "' is not properly formatted.");
                     Location loc = new SpreadsheetLocation(segment);
-                    cells.get(loc.getRow()).set(loc.getCol(), new TextCell());
+                    cells.get(loc.getRow()).set(loc.getCol(), new EmptyCell());
                     System.out.print(getGridText());
                     return "Cleared " + segment;
                 } else {
@@ -128,8 +129,7 @@ public class Spreadsheet implements Grid {
                         System.out.print(getGridText());
                         return "";
                     } else {
-                        String text = getCell(loc).fullCellText();
-                        return text.equals("\"\"") ? "Empty Cell" : text;
+                        return getCell(loc).fullCellText();
                     }
                 } else {
                     throw new InvalidCommandException("Unknown command '" + segment + "'.");
