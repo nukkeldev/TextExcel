@@ -22,7 +22,7 @@ public class Spreadsheet implements Grid {
             for (int i = 0; i < 20; i++) {
                 add(new ArrayList<>() {{
                     for (int j = 0; j < 12; j++)
-                        add(null);
+                        add(new TextCell());
                 }});
             }
         }};
