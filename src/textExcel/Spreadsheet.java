@@ -82,15 +82,13 @@ public class Spreadsheet implements Grid {
                         switch (args[1]) {
                             case "PercentCell" -> cells.get(loc.getRow()).set(loc.getCol(), new PercentCell(Double.parseDouble(args[2])));
                             case "TextCell" -> cells.get(loc.getRow()).set(loc.getCol(), new TextCell(args[2]));
+                            case "ValueCell" -> cells.get(loc.getRow()).set(loc.getCol(), new ValueCell(Double.parseDouble(args[2])));
                         }
 
                     }
                 } catch (IOException e) {
                     System.out.println("An error has occurred when opening!");
                 }
-
-                // Open
-
                 System.out.print(getGridText());
                 System.out.println("Opened " + pathString);
             }
