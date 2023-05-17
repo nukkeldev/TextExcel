@@ -2,10 +2,10 @@ package textExcel;
 
 // Update this file with your own code.
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Spreadsheet implements Grid {
@@ -30,45 +30,113 @@ public class Spreadsheet implements Grid {
 
     @Override
     public String processCommand(String command) {
-        Iterator<String> segments = Arrays.stream(command.split(" ")).iterator();
+        var presentments = command.split(" ");
+        Iterator<String> segments = Arrays.stream(presentments).iterator();
 
         String segment = segments.next();
         switch (segment) {
             case "clear" -> {
                 if (segments.hasNext()) {
-					segment = segments.next();
-					if (!CELL.matcher(segment).matches()) throw new InvalidCellException("Cell '" + segment + "' is not properly formatted.");
+                    segment = segments.next();
+                    if (!CELL.matcher(segment).matches())
+                        throw new InvalidCellException("Cell '" + segment + "' is not properly formatted.");
                     Location loc = new SpreadsheetLocation(segment);
-                    cells.get(loc.getRow()).set(loc.getCol(), null);
-                    System.out.println(getGridText());
+                    cells.get(loc.getRow()).set(loc.getCol(), new TextCell());
+                    System.out.print(getGridText());
                     return "Cleared " + segment;
                 } else {
                     clearGrid();
+                    System.out.print(getGridText());
                     return "Cleared the grid";
                 }
             }
             case "save" -> {
                 if (!segments.hasNext()) throw new InvalidCommandException("'save' requires a file path argument.");
-                // Save
+                String pathString = segments.next();
+
+                try (FileWriter writer = new FileWriter(pathString)) {
+                    for (int i = 0; i < cells.size(); i++) {
+                        var row = cells.get(i);
+                        for (int j = 0; j < row.size(); j++) {
+                            String text = row.get(j).fullCellText();
+                            if (text.equals("\"\"")) continue;
+                            writer.write(String.format("%s,%s,%s\n", String.valueOf((char)('A' + j)) + (i + 1), row.get(j).getClass().getSimpleName(), text));
+                        }
+                    }
+                } catch (IOException e) {
+                    System.out.println("An error has occurred when saving!");
+                    e.printStackTrace();
+                }
+                System.out.print(getGridText());
+                System.out.println("Saved " + pathString);
             }
             case "open" -> {
                 if (!segments.hasNext()) throw new InvalidCommandException("'open' requires a file path argument.");
+                String pathString = segments.next();
+                try{
+                    Scanner scanner = new Scanner(new File(pathString));
+                    while (scanner.hasNext()) {
+                        String line = scanner.nextLine();
+                        String[] args = line.split(",");
+                        SpreadsheetLocation loc = new SpreadsheetLocation(args[0]);
+                        switch (args[1]) {
+                            case "PercentCell" -> cells.get(loc.getRow()).set(loc.getCol(), new PercentCell(Double.parseDouble(args[2])));
+                            case "TextCell" -> cells.get(loc.getRow()).set(loc.getCol(), new TextCell(args[2]));
+                        }
+
+                    }
+                } catch (IOException e) {
+                    System.out.println("An error has occurred when opening!");
+                }
+
                 // Open
+
+                System.out.print(getGridText());
+                System.out.println("Opened " + pathString);
             }
             default -> {
+                segment = segment.toUpperCase();
                 if (CELL.matcher(segment).matches()) {
-					Location loc = new SpreadsheetLocation(segment);
+                    Location loc = new SpreadsheetLocation(segment);
                     if (segments.hasNext() && segments.next().equals("=")) {
-//                        cells.get(loc.getRow()).set(loc.getCol(), )
+                        StringBuilder segB = new StringBuilder(segments.next());
+                        while (segments.hasNext()) segB.append(" ").append(segments.next());
+                        segment = segB.toString();
+                        cells.get(loc.getRow()).set(loc.getCol(), switch (segment.charAt(segment.length() - 1)) {
+                            case '%' -> {
+                                try {
+                                    double value = Double.parseDouble(segment.substring(0, segment.length() - 1));
+                                    yield new PercentCell(value);
+                                } catch (RuntimeException e) {
+                                    throw new RuntimeException("Invalid percent format.");
+                                }
+                            }
+                            case '"' -> {
+                                if (segment.charAt(0) != '"')
+                                    throw new RuntimeException("Quote not found at beginning of text value.");
+                                yield new TextCell(segment);
+                            }
+                            default -> {
+                                try {
+                                    double value = Double.parseDouble(segment);
+                                    yield new ValueCell(value);
+                                } catch (RuntimeException e) {
+                                    throw new RuntimeException("Invalid value.");
+                                }
+                            }
+                        });
+                        System.out.print(getGridText());
+                        return "";
                     } else {
-                        return getCell(loc).fullCellText();
+                        String text = getCell(loc).fullCellText();
+                        return text.equals("\"\"") ? "Empty Cell" : text;
                     }
                 } else {
                     throw new InvalidCommandException("Unknown command '" + segment + "'.");
                 }
             }
         }
-        return null;
+        return "";
     }
 
     @Override
@@ -87,8 +155,7 @@ public class Spreadsheet implements Grid {
     }
 
     private String getAbbreviatedCellValue(Location loc) {
-        Cell cell = getCell(loc);
-        return cell == null ? "          " : cell.abbreviatedCellText();
+        return getCell(loc).abbreviatedCellText();
     }
 
     @Override

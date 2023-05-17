@@ -12,10 +12,9 @@ public class TextExcel {
 		while (!cmd.equals("quit")) {
 			try {
 				String output = spreadsheet.processCommand(cmd);
-				System.out.println(output);
+				if (!output.equals("")) System.out.println(output);
 			} catch (RuntimeException e) {
 				System.out.println(e.getMessage());
-				e.printStackTrace();
 			}
 			cmd = scanner.nextLine();
 		}
