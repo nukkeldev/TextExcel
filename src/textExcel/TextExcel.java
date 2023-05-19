@@ -7,14 +7,18 @@ public class TextExcel {
 		Spreadsheet spreadsheet = new Spreadsheet();
 		Scanner scanner = new Scanner(System.in);
 		System.out.print(spreadsheet.getGridText());
+		System.out.print("> ");
 		String cmd = scanner.nextLine();
 		while (!cmd.equals("quit")) {
 			try {
+
 				String output = spreadsheet.processCommand(cmd);
 				if (!output.equals("")) System.out.println(output);
 			} catch (RuntimeException e) {
 				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
+			System.out.print("> ");
 			cmd = scanner.nextLine();
 		}
 	}

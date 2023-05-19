@@ -40,7 +40,7 @@ public class Spreadsheet implements Grid {
                 if (segments.hasNext()) {
                     segment = segments.next();
                     if (!CELL.matcher(segment).matches())
-                        throw new InvalidCellException("Cell '" + segment + "' is not properly formatted.");
+                        throw new RuntimeException("Cell '" + segment + "' is not properly formatted.");
                     Location loc = new SpreadsheetLocation(segment);
                     cells.get(loc.getRow()).set(loc.getCol(), new EmptyCell());
                     System.out.print(getGridText());
@@ -52,7 +52,7 @@ public class Spreadsheet implements Grid {
                 }
             }
             case "save" -> {
-                if (!segments.hasNext()) throw new InvalidCommandException("'save' requires a file path argument.");
+                if (!segments.hasNext()) throw new RuntimeException("'save' requires a file path argument.");
                 String pathString = segments.next();
 
                 try (FileWriter writer = new FileWriter(pathString)) {
@@ -72,7 +72,7 @@ public class Spreadsheet implements Grid {
                 System.out.println("Saved " + pathString);
             }
             case "open" -> {
-                if (!segments.hasNext()) throw new InvalidCommandException("'open' requires a file path argument.");
+                if (!segments.hasNext()) throw new RuntimeException("'open' requires a file path argument.");
                 String pathString = segments.next();
                 try{
                     Scanner scanner = new Scanner(new File(pathString));
@@ -130,7 +130,7 @@ public class Spreadsheet implements Grid {
                         return getCell(loc).fullCellText();
                     }
                 } else {
-                    throw new InvalidCommandException("Unknown command '" + segment + "'.");
+                    throw new RuntimeException("Unknown command '" + segment + "'.");
                 }
             }
         }
@@ -164,10 +164,10 @@ public class Spreadsheet implements Grid {
             builder.append((char) i).append("         |");
         }
         builder.append("\n");
-        for (int i = 0; i < 20; i++) {
-            builder.append(String.format("%-3d|", i + 1));
-            for (int j = 0; j < 12; j++) {
-                builder.append(getAbbreviatedCellValue(new SpreadsheetLocation(j, i))).append("|");// TODO: Why reverse????
+        for (int row = 0; row < 20; row++) {
+            builder.append(String.format("%-3d|", row + 1));
+            for (int col = 0; col < 12; col++) {
+                builder.append(getAbbreviatedCellValue(new SpreadsheetLocation(row, col))).append("|");
             }
             builder.append("\n");
         }
