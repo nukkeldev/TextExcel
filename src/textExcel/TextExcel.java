@@ -16,7 +16,6 @@ public class TextExcel {
 				if (!output.equals("")) System.out.println(output);
 			} catch (RuntimeException e) {
 				System.out.println(e.getMessage());
-				e.printStackTrace();
 			}
 			System.out.print("> ");
 			cmd = scanner.nextLine();
