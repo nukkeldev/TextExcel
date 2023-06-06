@@ -60,7 +60,7 @@ public class Spreadsheet implements Grid {
                         var row = cells.get(i);
                         for (int j = 0; j < row.size(); j++) {
                             String text = row.get(j).fullCellText();
-                            if (text.equals("\"\"")) continue;
+                            if (text.equals("")) continue;
                             writer.write(String.format("%s,%s,%s\n", String.valueOf((char)('A' + j)) + (i + 1), row.get(j).getClass().getSimpleName(), text));
                         }
                     }

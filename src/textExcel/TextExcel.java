@@ -9,7 +9,7 @@ public class TextExcel {
 		System.out.print(spreadsheet.getGridText());
 		System.out.print("> ");
 		String cmd = scanner.nextLine();
-		while (!cmd.equals("quit")) {
+		while (!cmd.equalsIgnoreCase("quit")) {
 			try {
 
 				String output = spreadsheet.processCommand(cmd);
